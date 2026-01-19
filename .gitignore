@@ -1,0 +1,26 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs / temp
+*.log
+*.tmp
+
+# Env / secrets
+.env
+*.pem
+*.key
+
+# Node / Python (해당 시)
+node_modules/
+__pycache__/
+*.pyc
+
+# Recordings (폴더만 올리고 내부 파일은 제외)
+recordings/*
+!recordings/.gitkeep
+
+# Docker local volumes (필요 시)
+data/

@@ -1,0 +1,20 @@
+services:
+  asterisk:
+    image: andrius/asterisk:20
+    container_name: asterisk
+    restart: unless-stopped
+
+    # SIP(5060) + RTP(10000-10100) 오픈
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "10000-10100:10000-10100/udp"
+
+    # 우리가 만든 설정 파일만 덮어씀(전체 /etc/asterisk 를 통째로 마운트하지 않음)
+    volumes:
+      - ./asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./asterisk/rtp.conf:/etc/asterisk/rtp.conf:ro
+
+      # 녹취 파일을 호스트에 남기기 위한 볼륨
+      - ./recordings:/recordings
