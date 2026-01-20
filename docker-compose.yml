@@ -10,6 +10,7 @@ services:
       - "5060:5060/tcp"
       - "10000-10100:10000-10100/udp"
 
+<<<<<<< HEAD
     # 우리가 만든 설정 파일만 덮어씀(전체 /etc/asterisk 를 통째로 마운트하지 않음)
     volumes:
       - ./asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
@@ -18,3 +19,21 @@ services:
 
       # 녹취 파일을 호스트에 남기기 위한 볼륨
       - ./recordings:/recordings
+=======
+    # Asterisk 설정: pjsip.conf는 템플릿에서 컨테이너 시작 시 생성
+    environment:
+      - ADVERTISE_ADDR=${ADVERTISE_ADDR}
+      - LOCAL_NETS=${LOCAL_NETS}
+
+    volumes:
+      - ./asterisk/pjsip.conf.tmpl:/etc/asterisk/pjsip.conf.tmpl:ro
+      - ./asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./asterisk/rtp.conf:/etc/asterisk/rtp.conf:ro
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
+
+      # 녹취 파일을 호스트에 남기기 위한 볼륨
+      - ./recordings:/recordings
+
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    command: ["asterisk", "-f", "-U", "asterisk", "-G", "asterisk", "-vvv"]
+>>>>>>> 9ea7490 (fix: NAT/SDP 광고 안정화 및 .env 자동 세팅 스크립트 추가(network 변경에도 동작))

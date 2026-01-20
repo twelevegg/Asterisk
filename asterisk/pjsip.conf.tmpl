@@ -1,0 +1,160 @@
+[global]
+type=global
+user_agent=Asterisk-Docker
+
+; =============================
+; Transport
+; =============================
+[transport-udp]
+type=transport
+protocol=udp
+bind=0.0.0.0:5060
+
+; Asterisk가 외부(Zoiper 등)에게 "내가 여기로 RTP/SIP 보내"라고 광고할 주소
+; - 로컬(같은 Wi-Fi): 노트북 Wi-Fi IPv4 (예: 192.168.10.111)
+; - 외부(LTE/다른 Wi-Fi): Tailscale/ZeroTier IP 또는 AWS 공인 IP/도메인
+external_signaling_address=__ADVERTISE_ADDR__
+external_signaling_port=5060
+external_media_address=__ADVERTISE_ADDR__
+
+; 중요(Windows Docker Desktop 기준):
+; - Asterisk 컨테이너는 실제 단말 IP(예: 192.168.10.x)를 직접 보지 못하고,
+;   Docker 게이트웨이(예: 172.19.0.1)에서 온 것처럼 보입니다.
+; - local_net에 172.16.0.0/12(=172.19 포함)을 넣으면 단말을 "local"로 오판해서
+;   SDP에 컨테이너 IP(172.19.0.2)가 광고되고, 그 결과 RTP가 전부 실패(무음/0초 녹취)할 수 있습니다.
+; 따라서 여기 local_net에는 "클라이언트가 존재하는 네트워크"(예: 192.168.0.0/16, 10.0.0.0/8, Tailscale 등)만 넣고,
+; Docker 대역(172.16/12)은 넣지 않습니다.
+;
+; 콤마(,)로 여러 대역 지정 가능
+local_net=__LOCAL_NETS__
+
+
+; =============================
+; Endpoint 1001
+; =============================
+[1001]
+type=endpoint
+context=internal
+disallow=all
+allow=ulaw,alaw
+auth=1001-auth
+aors=1001
+direct_media=no
+
+; 명시적으로 transport를 지정(환경에 따라 transport 필드가 비어있을 때가 있어 고정)
+transport=transport-udp
+
+; Windows Docker NAT 환경에서 SDP 광고 주소가 꼬이는 것을 방지하기 위해 media_address를 강제
+media_address=__ADVERTISE_ADDR__
+
+; NAT/브리지 환경 안정화
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+
+[1001-auth]
+type=auth
+auth_type=userpass
+username=1001
+password=pass1001
+
+[1001]
+type=aor
+max_contacts=1
+remove_existing=yes
+
+
+; =============================
+; Endpoint 1002
+; =============================
+[1002]
+type=endpoint
+context=internal
+disallow=all
+allow=ulaw,alaw
+auth=1002-auth
+aors=1002
+direct_media=no
+
+transport=transport-udp
+media_address=__ADVERTISE_ADDR__
+
+; NAT/브리지 환경 안정화
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+
+[1002-auth]
+type=auth
+auth_type=userpass
+username=1002
+password=pass1002
+
+[1002]
+type=aor
+max_contacts=1
+remove_existing=yes
+
+
+; =============================
+; Endpoint 2001 (Phone)
+; =============================
+[2001]
+type=endpoint
+context=internal
+disallow=all
+allow=ulaw,alaw
+auth=2001-auth
+aors=2001
+direct_media=no
+
+transport=transport-udp
+media_address=__ADVERTISE_ADDR__
+
+; NAT/브리지 환경 안정화
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+
+[2001-auth]
+type=auth
+auth_type=userpass
+username=2001
+password=pass2001
+
+[2001]
+type=aor
+max_contacts=1
+remove_existing=yes
+
+
+; =============================
+; Endpoint 2002 (Phone)
+; =============================
+[2002]
+type=endpoint
+context=internal
+disallow=all
+allow=ulaw,alaw
+auth=2002-auth
+aors=2002
+direct_media=no
+
+transport=transport-udp
+media_address=__ADVERTISE_ADDR__
+
+; NAT/브리지 환경 안정화
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+
+[2002-auth]
+type=auth
+auth_type=userpass
+username=2002
+password=pass2002
+
+[2002]
+type=aor
+max_contacts=1
+remove_existing=yes

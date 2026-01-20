@@ -18,7 +18,11 @@ node_modules/
 __pycache__/
 *.pyc
 
+<<<<<<< HEAD
 # Recordings (폴더만 올리고 내부 파일은 제외)
+=======
+# Recordings (폴더만 추적, 내부 파일은 제외)
+>>>>>>> 9ea7490 (fix: NAT/SDP 광고 안정화 및 .env 자동 세팅 스크립트 추가(network 변경에도 동작))
 recordings/*
 !recordings/.gitkeep
 
